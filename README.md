@@ -14,7 +14,6 @@ This is the code repository for the paper: "A Case Study on the Impact of Anonym
   - [Running GuardRAG LIVE](#running-guardrag-live)
   - [Screenshots](#screenshots-1)
 - [Project Structure](#project-structure)
-- [Server Processing](#server-processing)
 - [Experiment Methodology](#experiment-methodology)
 
 ## Demo 1: GuardRAG
@@ -41,7 +40,6 @@ The demo allows you to:
 
 **Prerequisites:**
 - Python 3.10 or newer
-- PostgreSQL 14 or newer (for full functionality)
 
 1. Clone this repository:
    ```bash
@@ -69,29 +67,10 @@ The demo allows you to:
    python -m wn download oewn:2022
    ```
 
-5. For the LIVE version and database functionality, create a `.env` file in the root directory:
+5. For GuardRAG LIVE, create a `.env` file in the root directory:
    ```
-   DATABASE_URL=postgresql://postgres:@localhost:5432/postgres
    OPENAI_API_KEY=your_openai_api_key_here
-   PINECONE_API_KEY=your_pinecone_api_key_here
    ```
-
-6. (Optional) For server-side processing of DP methods:
-   ```bash
-   pip install -r requirements_presidio.txt   # PII detection
-   pip install -r requirements_dp.txt          # Differential privacy methods
-   ```
-   
-**Note on Database:**
-- For the pre-computed demo (GuardRAG), the CSV files in `src/Demo/` are used directly - no database required
-- For GuardRAG LIVE and full experimentation, PostgreSQL must be running:
-  ```bash
-  # On macOS (using Homebrew):
-  brew services start postgresql@14
-
-  # Verify it's running:
-  pg_isready -h localhost -p 5432
-  ```
 
 ### Running GuardRAG
 
@@ -142,7 +121,7 @@ Available privacy-preserving methods:
 
 ### Installation
 
-Follow the installation steps from [Demo 1: Installation](#installation) above, ensuring you complete steps 1-5. The `.env` file (step 5) is required for GuardRAG LIVE to function properly.
+Follow the installation steps from [Demo 1: Installation](#installation) above. The `.env` file (step 5) is required for GuardRAG LIVE to function properly.
 
 ### Running GuardRAG LIVE
 
@@ -171,39 +150,27 @@ Follow the installation steps from [Demo 1: Installation](#installation) above, 
 
 ```
 GuardRAG_with_TAB/
-├── SLR/                                  # Systematic Literature Review Resources
-│   ├── White_Literature.md               # List with all the titles and links of the papers
-│   ├── Grey_Literature.md                # List with all the titles and link of the websites and videos
-│   └── Systematic Literature Review.pdf  # Notes for all the papers in the SLR
 ├── .env                   # Environment variables configuration
 ├── pyproject.toml         # Project dependencies and metadata
 ├── requirements.txt       # Project dependencies
-├── requirements_presidio.txt  # Presidio server processing dependencies
-├── requirements_dp.txt        # Differential privacy server processing dependencies
-├── server.conf            # Shared server config for shell scripts
-├── run_diffractor_on_server.sh   # Run Diffractor on remote server
-├── run_dp_prompt_on_server.sh    # Run DP-Prompt on remote server
-├── run_dp_mlm_on_server.sh       # Run DP-MLM on remote server
-├── run_response_diffractor_on_server.sh  # Run response Diffractor on remote server
 ├── README.md
 └── src/                   # Source code
+    ├── cache.py           # Caching utilities
     ├── constants.py       # Shared constants (text types, epsilons, column mappings)
     ├── Data/              # Data loading and database management
     │   ├── CSV_loader.py
     │   ├── Data_loader.py
     │   ├── Database_management.py
+    │   ├── Dataset_TAB_preparation.py        # TAB dataset inspection and preparation
     │   ├── Response_postprocessor.py
-    │   ├── anonymize_to_csv_server.py     # Server-side anonymization (all DP methods)
-    │   ├── load_dp_csv_to_database.py     # Load DP CSV results into database
-    │   ├── load_csv_to_database.py        # Load generic CSV into database
-    │   ├── prepare_TAB_dataset.py         # TAB dataset inspection and preparation
-    │   ├── save_text.py                   # TAB JSON to CSV conversion
-    │   ├── export_tab_responses_to_csv.py # Export TAB responses for server processing
-    │   ├── PrivFill_BBC_preprocessing.ipynb
-    │   └── PrivFill_Enron_preprocessing.ipynb
+    │   ├── backup_database.py
+    │   ├── Dataset_BBC_preparation.ipynb
+    │   ├── Dataset_Enron_preparation.ipynb
+    │   └── Dataset_TAB_first_1000_echr_train.csv
     ├── Demo/              # Streamlit demo applications
     │   ├── GuardRAG.py          # Demo for experiments from the paper
     │   ├── GuardRAG_LIVE.py     # Demo for trying out new texts
+    │   ├── PDF_reader.py        # PDF file processing utilities
     │   ├── bbc_text2.csv
     │   ├── bbc_responses2.csv
     │   ├── enron_text_all.csv
@@ -214,37 +181,17 @@ GuardRAG_with_TAB/
     │   ├── Diffractor/    # Diffractor implementation
     │   └── PrivFill/      # DP-Prompt implementation
     ├── Presidio/          # PII detection and anonymization
+    │   ├── Presidio.py
     │   ├── Presidio_NLP_engine.py
     │   ├── Presidio_OpenAI.py
     │   └── Presidio_helpers.py
     └── RAG/               # Retrieval-augmented generation
+        ├── Local_LlamaIndex.py
         ├── Pinecone_LlamaIndex.py
         ├── Response_evaluation.py
         ├── Response_generation.py
-        ├── response_anonymize_to_csv_server.py          # Server-side response anonymization
-        ├── fill_helpers.py                              # Shared utilities for fill scripts
-        ├── fill_presidio_diffractor_responses_tab.py    # Fill Presidio/Diffractor TAB responses
-        ├── fill_dp_dpmlm_responses_tab.py               # Fill DP-Prompt/DPMLM TAB responses
-        └── fill_response_with_pii_tab.py                # Fill original TAB responses
+        └── Response_postprocessor.py
 ```
-
-## Server Processing
-
-CPU-intensive differential privacy methods (Diffractor, DP-Prompt, DP-MLM) run on a remote server. The workflow for each method:
-
-1. Transfer code and TAB dataset CSV to server via rsync/scp
-2. Create/activate a Python virtual environment (`venv_dp`) and install `requirements_dp.txt`
-3. Run the anonymization (e.g., `anonymize_to_csv_server.py --method diffractor`)
-4. Copy the result CSV back to the local machine
-5. Load the CSV into the PostgreSQL database (e.g., `load_dp_csv_to_database.py --method diffractor`)
-
-Shell scripts that automate steps 1-3:
-- `run_diffractor_on_server.sh`
-- `run_dp_prompt_on_server.sh`
-- `run_dp_mlm_on_server.sh`
-- `run_response_diffractor_on_server.sh` (for Experiment 2 response anonymization)
-
-All scripts share server configuration from `server.conf`.
 
 ## Experiment Methodology
 
@@ -263,7 +210,7 @@ Preprocessing steps:
 - Filtering of too long documents
 - Sorting of documents in decreasing order of the number of PII detected in the text using Microsoft Presidio
 - The cleaned datasets were saved as CSV files for further processing
-- For TAB: the first 1,000 entries from `echr_train.json` were extracted and converted to CSV via `save_text.py`. The dataset is filtered and prepared using `prepare_TAB_dataset.py`. By default, 200 samples are loaded into the database (see "Selecting TAB Samples" below for customization).
+- For TAB: the first 1,000 entries from `echr_train.json` were extracted and converted to CSV. The dataset is filtered and prepared using `Dataset_TAB_preparation.py`. By default, 200 samples are used in the experiments (see "Selecting TAB Samples" below for customization).
 
 **Selecting TAB Samples:**
 
@@ -287,10 +234,10 @@ python CSV_loader.py
 ```
 
 Relevant files:
-- `src/Data/PrivFill_BBC_preprocessing.ipynb`
-- `src/Data/PrivFill_Enron_preprocessing.ipynb`
-- `src/Data/save_text.py` (TAB JSON to CSV conversion)
-- `src/Data/prepare_TAB_dataset.py` (TAB dataset inspection and preparation)
+- `src/Data/Dataset_BBC_preparation.ipynb`
+- `src/Data/Dataset_Enron_preparation.ipynb`
+- `src/Data/Dataset_TAB_preparation.py` (TAB dataset inspection and preparation)
+- `src/Data/Dataset_TAB_first_1000_echr_train.csv` (TAB dataset CSV file)
 </details>
 
 <details>
@@ -317,19 +264,20 @@ Relevant files/folders:
 </details>
 
 <details>
-<summary><h3>3. RAG and Vector Database Creation</h3></summary>
+<summary><h3>3. RAG and Vector Store Creation</h3></summary>
 
 Setup of the RAG system:
 - Created vector embeddings for each text (original and anonymized versions)
-- Used Pinecone as the vector database
+- Used Pinecone as the vector store
 - Integrated with LlamaIndex for efficient retrieval
 
 Relevant files:
-- `src/RAG/Pinecone_LlamaIndex`
+- `src/RAG/Pinecone_LlamaIndex.py`
+- `src/RAG/Local_LlamaIndex.py`
 </details>
 
 <details>
-<summary><h3>4. Database Creation</h3></summary> 
+<summary><h3>4. Database Creation</h3></summary>
 
 A PostgreSQL database was created to store:
 - Original texts with PII
@@ -353,17 +301,17 @@ Relevant files:
 
 The first experiment was conducted to evaluate the effectiveness of applying privacy-preserving techniques before text indexing:
 
-<summary><h4>Data Loading</h4></summary>
-The data loading process:
+<summary><h4>Data Processing</h4></summary>
+The data processing workflow:
 - Loading original texts and analyzing them for PII using Presidio
 - Applying different anonymization methods to the texts
-- Storing both the original and anonymized versions in the database
-- Indexing all versions in the vector database for retrieval
+- Indexing all versions (original and anonymized) in the vector store for retrieval
 
 Relevant files:
 - `src/Data/CSV_loader.py`
 - `src/Data/Data_loader.py`
-- `src/Data/Response_postprocessor.py`
+- `src/Data/Database_management.py`
+- `src/Presidio/Presidio.py`
 
 <summary><h4>Response Generation</h4></summary>
 
@@ -372,13 +320,11 @@ Response generation methodology:
   1. Utility question: Asking for a factual summary of the text
   2. Privacy question: Asking for private or sensitive information in the text
 - Generated responses using both original and anonymized texts
-- For TAB: responses generated for 200 documents across 7 text types (original + Presidio + Diffractor), extendable to all 13 text types. The `--last` parameter in `Response_generation.py` should match the number of samples loaded in the database.
+- For TAB: responses generated for 200 documents across 7 text types (original + Presidio + Diffractor), extendable to all 13 text types
 
 Relevant files:
 - `src/RAG/Response_generation.py`
-- `src/RAG/fill_presidio_diffractor_responses_tab.py` (fill Presidio and Diffractor response columns for TAB)
-- `src/RAG/fill_dp_dpmlm_responses_tab.py` (fill DP-Prompt and DPMLM response columns for TAB)
-- `src/RAG/fill_response_with_pii_tab.py` (fill original response column for TAB)
+- `src/RAG/Pinecone_LlamaIndex.py`
 </details>
 
 <details>
@@ -393,14 +339,12 @@ The second experiment was conducted to evaluate the effectiveness of applying pr
   - Diffractor (with epsilon values 1, 2, 3)
   - DP-Prompt (with epsilon values 150, 200, 250)
   - DP-MLM (with epsilon values 50, 75, 100)
-- Stored post-processed responses in a separate database table (`*_responses_postprocessed`)
 - Evaluated both utility and privacy metrics for post-processed responses
-- For TAB: response anonymization for Diffractor runs on remote server via `run_response_diffractor_on_server.sh`
 
 Relevant files:
 - `src/Data/Response_postprocessor.py`
+- `src/RAG/Response_postprocessor.py`
 - `src/Data/Database_management.py`
-- `src/RAG/response_anonymize_to_csv_server.py` (server-side response anonymization)
 </details>
 
 <details>

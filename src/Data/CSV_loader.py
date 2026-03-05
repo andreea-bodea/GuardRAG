@@ -97,7 +97,6 @@ def load_tab(type):
     with open(file_path, mode='r', newline='', encoding='utf-8') as csvfile:
         csv_reader = csv.reader(csvfile)
         for row_number, row in enumerate(csv_reader, start=1):
-            if row_number <= 2: continue
             if row_number > 200: break
             text_with_pii = row[0]
             file_name = f"TAB_{row_number}"
