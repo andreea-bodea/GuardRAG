@@ -1,0 +1,7 @@
+mpmath
+nltk
+numpy
+pandas
+torch
+tqdm
+transformers

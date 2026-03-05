@@ -1,0 +1,59 @@
+# Core dependencies with specific versions for compatibility
+# Note: scipy<1.12 is required for gensim compatibility (triu function location)
+scipy<1.12
+numpy<1.28.0,>=1.21.6
+gensim>=4.3.0
+
+# Streamlit and UI
+streamlit>=1.30.0
+pandas>=2.0.0
+natsort>=8.0.0
+plotly>=5.15.0
+st-annotated-text>=0.0.6
+
+# Privacy and NLP
+presidio-analyzer>=2.2.0
+presidio-anonymizer>=2.2.0
+spacy>=3.0.0
+flair>=0.12.0
+scikit-learn>=1.2.0
+nltk>=3.8.1
+
+# Evaluation and embeddings
+rouge-score>=0.1.2
+sentence-transformers>=2.2.2
+transformers>=4.30.0
+torch>=2.0.0
+
+# AI and LLM
+openai>=1.0.0
+pinecone>=5.0.0
+python-dotenv>=1.0.0
+llama-index>=0.9.0
+llama-index-vector-stores-pinecone>=0.1.0
+psycopg2-binary>=2.9.0
+joblib>=1.3.0 
+llama-index-embeddings-langchain>=0.1.0
+
+# Document processing
+pymupdf>=1.24.14
+requests>=2.32.3
+tqdm>=4.67.1
+pillow>=11.0.0
+
+# LangChain
+langchain>=0.3.8
+langchain-anthropic>=0.3.0
+langchain-openai>=0.2.9
+langchain-community>=0.3.0
+langchain-core>=0.3.72
+streamlit-tags>=1.0.0
+chroma>=0.2.0
+
+# Additional utilities
+wn
+importlib-resources
+faiss-cpu
+diffprivlib
+nest-asyncio
+watchdog
