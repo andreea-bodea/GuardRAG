@@ -1,6 +1,6 @@
 # Privacy in RAG
 
-This is the code repository for the paper: "A Case Study on the Impact of Anonymization Along the RAG Pipeline"
+This is the code repository for the IWSPA 2026 paper: "A Case Study on the Impact of Anonymization Along the RAG Pipeline"
 
 ## Table of Contents
 - [Demo 1: GuardRAG](#demo-guardrag)
