@@ -1,3 +1,4 @@
+from typing import Optional
 import base64
 import io
 import os
@@ -59,7 +60,7 @@ async def pdf_page_to_text(buffer: bytes, page_num: int, language: str = "en") -
     )
     return response.content
 
-async def convert_pdf_to_text(buffer: bytes, language: str = "en", i: int | None = None) -> str:
+async def convert_pdf_to_text(buffer: bytes, language: str = "en", i: Optional[int] = None) -> str:
     try:
         document = pymupdf.open("pdf", buffer)
         num_pages = document.page_count

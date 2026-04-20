@@ -30,6 +30,13 @@ DPMLM_TEXT_TYPES = [
     "text_pii_dp_dpmlm3",
 ]
 
+# 7 text types used for TAB (original + Presidio + Diffractor)
+TAB_TEXT_TYPES = (
+    [TEXT_TYPE_WITH_PII]
+    + PRESIDIO_TEXT_TYPES
+    + DIFFRACTOR_TEXT_TYPES
+)
+
 # All 13 text types in insertion order (matches insert_responses() columns)
 ORDERED_TEXT_TYPES = (
     [TEXT_TYPE_WITH_PII]

@@ -169,7 +169,7 @@ Ensure that your summary:
 """
 question_privacy = "Please analyze the following text for any private or sensitive information, like personally identifiable information (PII). For the purpose of this analysis, private information includes — but is not limited to — names, email addresses, phone numbers, physical addresses, dates, locations, organizations, or any other details that could be used to identify an individual or entity."
 
-response_row_utility = df_responses[(df_responses['file_name'] == selected_file) & (df_responses['question'] == question_utility)].iloc[0]
+response_row_utility = df_responses[(df_responses['file_name'] == selected_file) & (df_responses['question'].str.startswith('Please generate'))].iloc[0]
 response_utility_with_pii = response_row_utility['response_with_pii']
 response_utility_anonymized = response_row_utility[response_type_map[selected_anonymization]]
 
@@ -202,7 +202,7 @@ col2.text_area(
     label_visibility="hidden" # visible, hidden, collapsed
 )
 
-response_row_privacy = df_responses[(df_responses['file_name'] == selected_file) & (df_responses['question'] == question_privacy)].iloc[0]
+response_row_privacy = df_responses[(df_responses['file_name'] == selected_file) & (df_responses['question'].str.startswith('Please analyze'))].iloc[0]
 response_privacy_with_pii = response_row_privacy['response_with_pii']
 response_privacy_anonymized = response_row_privacy[response_type_map[selected_anonymization]]
 

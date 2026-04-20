@@ -44,7 +44,7 @@ The demo allows you to:
 1. Clone this repository:
    ```bash
    git clone <repository-url>
-   cd GuardRAG_with_TAB
+   cd GuardRAG
    ```
 
 2. Create a Python virtual environment (recommended):
@@ -55,8 +55,6 @@ The demo allows you to:
 
 3. Install the required dependencies:
    ```bash
-   pip install -e .
-   # or alternatively:
    pip install -r requirements.txt
    ```
 
@@ -149,7 +147,7 @@ Follow the installation steps from [Demo 1: Installation](#installation) above. 
 ## Project Structure
 
 ```
-GuardRAG_with_TAB/
+GuardRAG/
 ├── .env                   # Environment variables configuration
 ├── pyproject.toml         # Project dependencies and metadata
 ├── requirements.txt       # Project dependencies
